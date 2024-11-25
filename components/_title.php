@@ -13,3 +13,5 @@ if (isset($_SESSION['user_type'])) {
     }
 }
 ?>
+
+echo '<a class="navbar-brand mx-auto mb-2 mb-lg-0 " href="#">Welcome '.ucfirst($_SESSION["username"]).'</a>';

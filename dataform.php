@@ -28,22 +28,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $cities = ($_POST['entry_mode'] == 'select') ? $_POST['city'] : $_POST['manual_city'];
     $schools = ($_POST['entry_mode'] == 'select') ? $_POST['school'] : $_POST['manual_school'];
 
-    $exist = "SELECT * FROM enquiry WHERE sname = '$sname' AND contact1 = '$mob1' AND contact2='$mob2'";
-    // $exist = "SELECT `sname`, `contact1`, `contact2` WHERE `sname` = '$sname' AND `contact1` = $mod1 AND `contact2` = $mod2 ";
+    $exist = "SELECT * FROM enquiry WHERE sname = '$sname' AND contact1 = '$mob1' OR contact2='$mob2'";
+    // $exist = "SELECT `sname`, `contact1`, `contact2` WHERE `sname` = '$sname' AND `contact1` = $mod1 OR `contact2` = $mod2 ";
     $select_query = mysqli_query($conn, $exist);
     $rowCount = mysqli_num_rows($select_query);
     if ($rowCount > 0) {
         $showError = "Student Name and Mobile number are same like previous entery";
     } else {
-        $insert = "INSERT INTO `enquiry`(`entery_type`, `sname`, `fname`, `contact1`, `contact2`, `ccategory`, `subject_stream`, `states`, `cities`, `schools`) VALUES ('$etype','$sname','$fname','$mob1','$mob2','$ccat','$substr','$states','$cities','$schools')";
-        // $query = "INSERT INTO `enquiry` (`entery_type`,`sname`, `fname`, `contact1`, `contact2`, `ccategory`, `subject_stream`,`states`, `cities`, `schools`) VALUES ('$etype', '$sname','$fname','$mob1','$mob2','$ccat','$substr', '$states','$cities','$schools')";
+        $insert = "INSERT INTO `enquiry`(`entry_type`, `sname`, `fname`, `contact1`, `contact2`, `ccategory`, `subject_stream`, `states`, `cities`, `schools`) VALUES ('$etype','$sname','$fname','$mob1','$mob2','$ccat','$substr','$states','$cities','$schools')";
         $insert_query = mysqli_query($conn, $insert);
         if ($insert_query) {
             $showAlert = true;
-            // header("location:enteryForm.php");
         }
     }
 }
+
+$username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest';
+
 ?>
 
 
@@ -56,6 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Student Entry Form</title>
     <!-- Bootstrap CSS -->
     <link href="bootstrap-5.3.3-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="bootstrap-5.3.3-dist/css/toastr.min.css" rel="stylesheet">
+
 </head>
 <style>
     .form-container {
@@ -64,36 +67,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         justify-content: center;
         align-items: center;
     }
+
 </style>
 
 <body>
     <?php include 'components/_navbar.php'; ?>
+    <!-- <h1 class="text-center mt-3">Welcome <?php echo ucfirst($username); ?></h1> -->
     <?php
     if ($showAlert) {
-        echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
-                            Student details is <strong>Successfully</strong> save into the list
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                      </div>';
+        echo '<div id="overlay-alert" class="alert alert-success alert-dismissible fade show position-absolute" style="top: 8%; left: 34%; z-index: 1050;">
+            Student details are <strong>Successfully</strong> saved into the list.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>';
     }
-    ?>
-    <?php
+
     if ($showError) {
-        echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">
-                        <strong>' . $showError . '</strong>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>';
+        echo '<div id="overlay-alert" class="alert alert-warning alert-dismissible fade show position-absolute" style="top: 8%; left: 30%; z-index: 1050;">
+            <strong>' . $showError . '</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>';
     }
     ?>
     <div class="d-flex justify-content-center align-items-center">
         <div class="form-container">
-            <div class="card my-5">
-                <h2 class="text-center my-3">Student Entry Form</h2>
+            <div class="my-5">
                 <div class="card-body">
+                    <h3 class="my-3" style="text-align: center;">Enter Student Details</h3>
 
                     <form class="row g-2" action="dataform.php" method="POST">
                         <div>
                             <select name="entery_type" class="form-select" id="entery_type">
-                                <option selected disabled>Select Form Type</option>
+                                <option value="Not Entered">Select Form Type</option>
                                 <option value="Enquire">Enquire Form</option>
                                 <option value="list">List</option>
                             </select>
@@ -121,8 +125,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                         <!-- Cast Category -->
                         <div class="col-md-4 mt-2">
-                            <select class="form-control" id="ccategory" name="ccategory" required>
-                                <option selected disabled>Select Cast Category</option>
+                            <select class="form-control" id="ccategory" name="ccategory">
+                                <option value="Not Entered">Select Cast Category</option>
                                 <option value="General">General</option>
                                 <option value="OBC">OBC</option>
                                 <option value="SC">SC</option>
@@ -133,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                         <div>
                             <select name="subject_stream" class="form-select" id="subject_stream">
-                                <option selected disabled>Which Subject Stream You Are</option>
+                                <option value="Not Entered">Which Subject Stream You Are</option>
                                 <option value="PCM">PCM</option>
                                 <option value="PCB">PCB</option>
                                 <option value="Commerce">Commerce</option>
@@ -160,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </select>
                             <input type="text" class="form-control" id="manual_state" name="manual_state" placeholder="Or enter state manually" style="display:none;">
                         </div>
-                        
+
                         <div class="col-md-6">
                             <!-- City Selection -->
                             <select class="form-control" id="city" name="city">
@@ -169,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </select>
                             <input type="text" class="form-control" id="manual_city" name="manual_city" placeholder="Or enter city manually" style="display:none;">
                         </div>
-                        
+
                         <div class="col-md-6">
                             <!-- School Selection -->
                             <select class="form-control" id="school" name="school">
@@ -314,6 +318,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Initial state setup
         toggleFields(true);
     </script>
+    <script>
+        // Automatically hide alert after 5 seconds
+        setTimeout(() => {
+            const overlayAlert = document.getElementById('overlay-alert');
+            if (overlayAlert) {
+                overlayAlert.classList.remove('show'); // Triggers fade out
+                overlayAlert.addEventListener('transitionend', () => overlayAlert.remove()); // Removes from DOM
+            }
+        }, 2000);
+    </script>
+
 </body>
 
 </html>

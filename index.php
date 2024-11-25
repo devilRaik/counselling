@@ -86,7 +86,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <?php
     if ($showError) {
-        echo '<div class="alert alert-warning alert-dismissible fade show" role="alert" id="auto-hide-alert">' . $showError . '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
+        echo '<div id="overlay-alert" class="alert alert-danger alert-dismissible fade show position-absolute" style="top: 10%; left: 43%; z-index: 1050;">
+            <strong>' . $showError . '</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>';
     }
     ?>
     <div class="login-container">
@@ -144,6 +147,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             return isValid;
         }
+    </script>
+    <script>
+        // Automatically hide alert after 5 seconds
+        setTimeout(() => {
+            const overlayAlert = document.getElementById('overlay-alert');
+            if (overlayAlert) {
+                overlayAlert.classList.remove('show'); // Triggers fade out
+                overlayAlert.addEventListener('transitionend', () => overlayAlert.remove()); // Removes from DOM
+            }
+        }, 2000);
     </script>
 </body>
 
