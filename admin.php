@@ -129,7 +129,7 @@ $states = $conn->query("SELECT * FROM states");
     <?php include 'components/_navbar.php'; ?>
     <?php
     if ($showAlert) {
-        echo '<div id="overlay-alert" class="alert alert-primary alert-dismissible fade show position-absolute" style="top: 8%; left: 34%; z-index: 1050;">
+        echo '<div id="overlay-alert" class="alert alert-primary alert-dismissible fade show position-absolute" style="top: 8%; left: 40%; z-index: 1050;">
             <strong>' . $showAlert . '</strong>.
           </div>';
     }
@@ -237,7 +237,7 @@ $states = $conn->query("SELECT * FROM states");
                             echo "<td class='text-center'>" . $row['subject_stream'] . "</td>";
                             echo "<td class='text-center'>" . $row['states'] . "</td>";
                             echo "<td class='text-center'>" . $row['cities'] . "</td>";
-                            echo "<td class='text-center'>" . $row['schools'] . "</td>";
+                            echo "<td class='text-center'>" . $row['school_name'] . "</td>";
                             echo "</tr>";
                         }
                     }
